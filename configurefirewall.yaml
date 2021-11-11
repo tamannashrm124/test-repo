@@ -1,0 +1,19 @@
+---
+- hosts: "{{ host }}"
+  gather_facts: yes
+  become_method: runas
+  vars:
+    ansible_become_password: "{{ ansible_password }}" 
+  tasks:
+  - name: "Create Firewall Rule for Corpuls application"
+    win_shell: |
+      New-NetFirewallRule -DisplayName "Synergi_Outbound" -Direction Outbound -Action Allow -Protocol TCP -RemotePort 80,443
+      New-NetFirewallRule -DisplayName "Synergi_Inbound" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 80,443
+    become: yes
+    become_user: "{{ ansible_user }}" 
+
+  - name: "Install Windows Server Feature RSAT-ADLDS"
+    win_shell: |
+      Install-WindowsFeature RSAT-ADLDS
+    become: yes
+    become_user: "{{ ansible_user }}" 
